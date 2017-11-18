@@ -21,11 +21,9 @@ void PID::UpdateError(double cte) {
   d_error = cte-p_error;
   p_error = cte;
   i_error += cte;
-
-  // Twiddle here
 }
 
 double PID::TotalError() {
-  return -Kp*p_error - Ki*i_error - Kd*d_error;
+  return -Kp*p_error - Kd*d_error - Ki*i_error;
 }
 

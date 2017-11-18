@@ -2,6 +2,7 @@
 #include <iostream>
 #include "json.hpp"
 #include "PID.h"
+#include "Twiddle.h"
 #include <math.h>
 
 // for convenience
@@ -31,10 +32,11 @@ int main() {
   uWS::Hub h;
 
   PID pid;
+  Twiddle twiddler;
 
-  pid.Init(0.2, 0.003, 2.5);
+  pid.Init(0, 0, 0);
 
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&pid, &twiddler](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -52,6 +54,12 @@ int main() {
 
           pid.UpdateError(cte);
 
+          twiddler.Update(steer_value, pow(cte, 2));
+
+          pid.Kp = twiddler.P[0];
+          pid.Ki = twiddler.P[1];
+          pid.Kd = twiddler.P[2];
+
           steer_value = pid.TotalError();
           if (steer_value > 1) {
             steer_value = 1;
@@ -59,14 +67,19 @@ int main() {
             steer_value = -1;
           }
 
+          /* std::cout << twiddler.iteration << ": "; */
+          std::cout << "Kp: " << twiddler.P[0] << " ";
+          std::cout << "Ki: " << twiddler.P[1] << " ";
+          std::cout << "Kd: " << twiddler.P[2] << std::endl;
+
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+          /* std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl; */
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+          /* std::cout << msg << std::endl; */
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {

@@ -12,9 +12,9 @@ Twiddle::Twiddle() {
   iteration = 0;
   total_error = 0;
 
-  dP[0] = 0.025;
+  dP[0] = 0.01;
   dP[1] = 0.0001;
-  dP[2] = 0.25;
+  dP[2] = 0.35;
 
   for (int i = 0; i < 3; i++) {
     P[i] = 0.0;

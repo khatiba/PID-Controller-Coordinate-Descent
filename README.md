@@ -1,7 +1,7 @@
 [//]: # (Image References)
 [image1]: ./animation.gif
 
-# Simple PID Controller with Parameter Estimation ("twiddle")
+# Simple PID Controller with Parameter Estimation using Coordinate Descent
 Self-Driving Car Engineer Nanodegree Program
 
 ---
